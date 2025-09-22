@@ -73,3 +73,6 @@ dmypy.json
 # Logs
 logs/
 .logs/
+
+# ENV File
+.env
