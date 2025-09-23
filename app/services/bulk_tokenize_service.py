@@ -6,6 +6,9 @@ from app.core.config import settings
 from app.utils.security import encrypt_data
 from app.utils.tokens import generate_tokenized_dict, generate_irreversible_token
 from app.db.models import DataVault
+from app.utils.logger import get_logger
+
+logger = get_logger("auth_service")
 
 def store_tokenized_data(db: Session, reference_id: str, reference_id_token: str, pii_token_json: dict, enc_json: str):
     """
@@ -49,6 +52,7 @@ def bulk_tokenize(request: dict, db: Session):
             reference_id = entry.get("referenceId")
 
             if not raw_kdata or not reference_id:
+                logger.warning('"Missing required fields: kdata or referenceId"', extra={ "txn": entry.get("txn"), "status_code": 404})
                 raise ValueError("Missing required fields: kdata or referenceId")
 
             decoded_kdata = base64.b64decode(raw_kdata).decode('utf-8')
@@ -82,6 +86,7 @@ def bulk_tokenize(request: dict, db: Session):
 
         except Exception as e:
             # Append failure response (keep your original field names)
+            logger.error('"FAILED: Bulk Tokenization Service Error."', extra={ "txn": request.get("txn"), "status_code": 500})
             responses.append({
                 "rtoken": None,
                 "referenceId": entry.get("referenceId"),

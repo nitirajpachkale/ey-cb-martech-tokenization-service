@@ -5,6 +5,7 @@ from app.utils.security import decrypt_data
 from app.db.models import DataVault
 import hashlib
 from app.db.models import IAMUser
+from app.utils.logger import get_logger
 
 # In-memory cache for IAM users
 iam_user_cache = {}
@@ -12,6 +13,7 @@ iam_user_cache = {}
 # -----------------------------
 # Utility Functions
 # -----------------------------
+logger = get_logger("auth_service")
 
 def hash_password(password: str) -> str:
     """Generate SHA-256 hash of the password."""
@@ -59,6 +61,7 @@ def detokenize(request: dict, db: Session):
 
         user_record = iam_user_cache.get(request.get("uname"))
         if not user_record or user_record["password_hash"] != hash_password(request.get("upwd")):
+            logger.warning('"Invalid username or password"', extra={ "txn": request.get("txn"), "status_code": 404})
             return {
                 "errMsg": "Invalid username or password",
                 "status": "-1"
@@ -79,6 +82,7 @@ def detokenize(request: dict, db: Session):
                     "txn": request.get("txn")
                 }
             except Exception as e:
+                logger.error(f'"Decryption or JSON parsing error: {str(e)}"', extra={ "txn": request.get("txn"), "status_code": 500})
                 response = {
                     "ret_data": None,
                     "remark": "FAILED : Decryption or JSON parsing error",
@@ -88,6 +92,7 @@ def detokenize(request: dict, db: Session):
                     "txn": request.get("txn")
                 }
         else:
+            logger.info('"FAILED : No record found"', extra={ "txn": request.get("txn"), "status_code": 200 })
             response = {
                 "ret_data": None,
                 "remark": "FAILED : No record found",
@@ -98,6 +103,7 @@ def detokenize(request: dict, db: Session):
             }
         return response
     except Exception as e:
+        logger.error(f'"De-Tokenizatin Service Error: {str(e)}"', extra={ "txn": request.get("txn"), "status_code": 500})
         return {
             "ret_data": None,
             "remark": "FAILED : De-Tokenizatin Service Error.",

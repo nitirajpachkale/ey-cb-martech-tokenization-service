@@ -6,6 +6,9 @@ from app.core.config import settings
 from app.utils.security import encrypt_data, decrypt_data
 from app.utils.tokens import generate_tokenized_dict, generate_irreversible_token
 from app.db.models import DataVault
+from app.utils.logger import get_logger
+
+logger = get_logger("auth_service")
 
 def store_tokenized_data(db: Session, reference_id: str, reference_id_token: str, pii_token_json: dict, enc_json: str):
     """
@@ -75,6 +78,7 @@ def tokenize(request: dict, db: Session):
         return response
 
     except Exception as e:
+        logger.error('"FAILED: Tokenization Service Error."', extra={ "txn": request.get("txn"), "status_code": 500})
         return {
             "piiTokens": None,
             "remark": "FAILED: Tokenization Service Error.",

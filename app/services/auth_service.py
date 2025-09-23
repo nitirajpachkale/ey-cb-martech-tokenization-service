@@ -45,9 +45,9 @@ def authenticate_user(auth_data: dict) -> dict:
 
         username = auth_data["username"]
         password_hash = hash_password(auth_data["password"])
-
         user_record = iam_user_cache.get(username)
         if not user_record or user_record["password_hash"] != password_hash:
+            logger.warning('"Missing or Invalid username or password"', extra={ "txn": auth_data["txn"], "status_code": 401})
             return {
                 "errMsg": "Invalid username or password",
                 "status": "-1"
@@ -74,6 +74,7 @@ def authenticate_user(auth_data: dict) -> dict:
         }
     
     except Exception as e:
+        logger.error(f'"Authentication Service Error: {str(e)}"', extra={ "txn": auth_data["txn"], "status_code": 500})
         return {
             "ret_data": None,
             "remark": "FAILED : Authentication Service Error.",
