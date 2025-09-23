@@ -8,7 +8,7 @@ from app.utils.tokens import generate_tokenized_dict, generate_irreversible_toke
 from app.db.models import DataVault
 from app.utils.logger import get_logger
 
-logger = get_logger("auth_service")
+logger = get_logger("bulk_tokenize_service")
 
 def store_tokenized_data(db: Session, reference_id: str, reference_id_token: str, pii_token_json: dict, enc_json: str):
     """

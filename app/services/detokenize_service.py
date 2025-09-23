@@ -13,7 +13,7 @@ iam_user_cache = {}
 # -----------------------------
 # Utility Functions
 # -----------------------------
-logger = get_logger("auth_service")
+logger = get_logger("detokenize_service")
 
 def hash_password(password: str) -> str:
     """Generate SHA-256 hash of the password."""
