@@ -3,6 +3,7 @@ from app.db.database import Base
 
 class DataVault(Base):
     __tablename__ = "tbl_datavault"
+    __table_args__ = {"schema": "SCM_TKN"}
 
     referenceid = Column(String, primary_key=True, index=True)
     referencetoken = Column(String)
