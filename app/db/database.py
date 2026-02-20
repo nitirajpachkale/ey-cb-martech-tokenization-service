@@ -6,7 +6,16 @@ from app.core.config import settings
 
 DATABASE_URL = settings.SQLALCHEMY_DATABASE_URL
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    pool_size=30,
+    max_overflow=50,
+    pool_timeout=30,
+    pool_recycle=1800,
+    pool_pre_ping=True,
+    echo=False
+)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

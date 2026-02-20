@@ -36,7 +36,7 @@ def get_encrypted_data_by_reference_id(db: Session, referenceid: str) -> dict:
     """
     Retrieve encrypted data from DataVault by reference ID.
     """
-    record = db.query(DataVault).filter(DataVault.referenceid == referenceid).first()
+    record = db.query(DataVault.encjson).filter(DataVault.referenceid == referenceid).first()
     if not record:
         return {
             "success": False,
