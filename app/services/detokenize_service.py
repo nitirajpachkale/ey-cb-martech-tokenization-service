@@ -32,15 +32,15 @@ def load_iam_users_to_cache(db: Session):
         for user in users
     }
 
-def get_encrypted_data_by_reference_id(db: Session, referenceid: str) -> dict:
+def get_encrypted_data_by_reference_id(db: Session, referenceToken: str) -> dict:
     """
     Retrieve encrypted data from DataVault by reference ID.
     """
-    record = db.query(DataVault.encjson).filter(DataVault.referenceid == referenceid).first()
+    record = db.query(DataVault.encjson).filter(DataVault.referencetoken == referenceToken).first()
     if not record:
         return {
             "success": False,
-            "errMsg": "No record found for the given referenceId"
+            "errMsg": "No record found for the given referenceToken"
         }
     return {
         "success": True,
@@ -53,7 +53,7 @@ def get_encrypted_data_by_reference_id(db: Session, referenceid: str) -> dict:
 
 def detokenize(request: dict, db: Session):
     """
-    Detokenize by decrypting the stored data for a given referenceId.
+    Detokenize by decrypting the stored data for a given referenceToken.
     """
     try:
         if not iam_user_cache:
@@ -68,7 +68,7 @@ def detokenize(request: dict, db: Session):
             }
 
         # Retrieve encrypted data
-        result_db = get_encrypted_data_by_reference_id(db, request.get("referenceId"))
+        result_db = get_encrypted_data_by_reference_id(db, request.get("referenceToken"))
         if result_db["success"]:
             try:
                 dec_data = decrypt_data(result_db["data"])

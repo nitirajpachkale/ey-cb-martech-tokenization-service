@@ -6,4 +6,4 @@ class DeTokenizeRequest(BaseModel):
     txn: str = Field(..., description="Transaction ID")
     uname: str = Field(..., description="Username (email)")
     upwd: str = Field(..., description="Password (hashed)")
-    referenceId: str = Field(..., description="Reference ID token")
+    referenceToken: str = Field(..., description="Reference ID token")
