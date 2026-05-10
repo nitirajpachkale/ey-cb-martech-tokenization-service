@@ -6,6 +6,9 @@ from app.db.models import DataVault
 import hashlib
 from app.db.models import IAMUser
 from app.utils.logger import get_logger
+import base64
+
+enc_token_key = base64.b64decode(settings.ENC_TOKEN_KEY)
 
 # In-memory cache for IAM users
 iam_user_cache = {}
@@ -71,7 +74,7 @@ def detokenize(request: dict, db: Session):
         result_db = get_encrypted_data_by_reference_id(db, request.get("referenceToken"))
         if result_db["success"]:
             try:
-                dec_data = decrypt_data(result_db["data"])
+                dec_data = decrypt_data(result_db["data"], enc_token_key)
                 pii_json = json.loads(dec_data)
                 response = {
                     "ret_data": pii_json,

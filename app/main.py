@@ -11,7 +11,9 @@ from app.core.config import settings
 from app.utils.security import encrypt_data
 import json
 from app.utils.logger import setup_logging
+import base64
 
+enc_payload_key = base64.b64decode(settings.ENC_PAYLOAD_KEY)
 listener = setup_logging()
 
 app = FastAPI(title="Tokenization App")
@@ -36,7 +38,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     
     if settings.ENCRYPTION_ENABLED:
         response_data = {
-            "encResData": encrypt_data(json.dumps(response_data))
+            "encResData": encrypt_data(json.dumps(response_data), enc_payload_key)
             }
 
     return JSONResponse(

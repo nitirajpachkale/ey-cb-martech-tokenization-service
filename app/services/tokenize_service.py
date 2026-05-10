@@ -3,11 +3,12 @@ import json
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.core.config import settings
-from app.utils.security import encrypt_data, decrypt_data
+from app.utils.security import encrypt_data
 from app.utils.tokens import generate_tokenized_dict, generate_irreversible_token
 from app.db.models import DataVault
 from app.utils.logger import get_logger
 
+enc_token_key = base64.b64decode(settings.ENC_TOKEN_KEY)
 logger = get_logger("tokenize_service")
 
 def store_tokenized_data(db: Session, reference_id: str, reference_id_token: str, pii_token_json: dict, enc_json: str):
@@ -49,7 +50,7 @@ def tokenize(request: dict, db: Session):
         pii_json = json.loads(decoded_kdata)
 
         # Encrypt the full PII data JSON
-        enc_json = encrypt_data(decoded_kdata)
+        enc_json = encrypt_data(decoded_kdata, enc_token_key)
 
         # Tokenize referenceId and PII JSON
         reference_id = request["referenceId"]

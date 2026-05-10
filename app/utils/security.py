@@ -21,9 +21,7 @@ def tokenize_fields(data: dict) -> dict:
     return {key: generate_token() for key in data.keys()}
 
 # AES-256-GCM encryption
-def encrypt_data(data: str) -> str:
-    # print(base64.b64encode(os.urandom(32)).decode())
-    key = base64.b64decode(settings.ENC_SECRET_KEY)
+def encrypt_data(data: str, key) -> str:
     if len(key) != 32:
         raise ValueError("Encryption key must be 32 bytes for AES-256")
     aesgcm = AESGCM(key)
@@ -31,9 +29,7 @@ def encrypt_data(data: str) -> str:
     ct = aesgcm.encrypt(nonce, data.encode(), None)
     return base64.b64encode(nonce + ct).decode()
 
-def decrypt_data(enc_data: str) -> str:
-    # Decode the encryption key from config
-    key = base64.b64decode(settings.ENC_SECRET_KEY)
+def decrypt_data(enc_data: str, key) -> str:
     if len(key) != 32:
         raise ValueError("Encryption key must be 32 bytes for AES-256")
 
