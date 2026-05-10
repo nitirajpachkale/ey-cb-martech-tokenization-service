@@ -10,6 +10,7 @@ from app.db.models import DataVault
 from app.db.queries.datavault_queries import upsert_datavault_bulk
 from app.utils.logger import get_logger
 
+enc_token_key = base64.b64decode(settings.ENC_TOKEN_KEY)
 logger = get_logger("bulk_tokenize_service")
 
 def bulk_tokenize(request: dict, db: Session):
@@ -33,7 +34,7 @@ def bulk_tokenize(request: dict, db: Session):
 
             # Tokenize referenceId and PII JSON
             reference_id_token = generate_irreversible_token(reference_id)
-            enc_json = encrypt_data(decoded_kdata)
+            enc_json = encrypt_data(decoded_kdata, enc_token_key)
             pii_token_json = generate_tokenized_dict(pii_json)
             
             merge_payload.append({

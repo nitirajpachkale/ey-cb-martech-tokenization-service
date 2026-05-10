@@ -4,6 +4,9 @@ from fastapi.responses import JSONResponse
 import json
 from app.core.config import settings
 from app.utils.security import decrypt_data
+import base64
+
+enc_payload_key = base64.b64decode(settings.ENC_PAYLOAD_KEY)
 
 class RequestDecryptionMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -13,7 +16,7 @@ class RequestDecryptionMiddleware(BaseHTTPMiddleware):
                 body = json.loads(body_bytes.decode("utf-8"))
 
                 if "encReqData" in body:
-                    decrypted_str = decrypt_data(body["encReqData"])
+                    decrypted_str = decrypt_data(body["encReqData"], enc_payload_key)
                     decrypted_json = json.loads(decrypted_str)
 
                     # Cache the decrypted body

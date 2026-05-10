@@ -5,11 +5,13 @@ from fastapi import Request
 import json
 from app.core.config import settings
 from app.utils.security import decrypt_data, encrypt_data
+import base64
+
+enc_payload_key = base64.b64decode(settings.ENC_PAYLOAD_KEY)
 
 class EncryptionMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if settings.ENCRYPTION_ENABLED:
-            print("###### YES")
             try:
                 body_bytes = await request.body()
                 body = json.loads(body_bytes.decode("utf-8"))
@@ -17,7 +19,7 @@ class EncryptionMiddleware(BaseHTTPMiddleware):
                 print("##### MID BODY : ", body)
 
                 if "encReqData" in body:
-                    decrypted_json_str = decrypt_data(body["encReqData"])
+                    decrypted_json_str = decrypt_data(body["encReqData"], enc_payload_key)
                     decrypted_json = json.loads(decrypted_json_str)
 
                     # Reconstruct request stream with decrypted body
@@ -46,7 +48,7 @@ class EncryptionMiddleware(BaseHTTPMiddleware):
 
             try:
                 plain_json = json.loads(original_body.decode("utf-8"))
-                encrypted_res_data = encrypt_data(json.dumps(plain_json))
+                encrypted_res_data = encrypt_data(json.dumps(plain_json), enc_payload_key)
                 return JSONResponse(content={"encResData": encrypted_res_data})
             except Exception as e:
                 return JSONResponse(

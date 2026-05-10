@@ -3,8 +3,11 @@ from logging.handlers import TimedRotatingFileHandler, QueueHandler, QueueListen
 from queue import Queue
 import os
 from datetime import datetime
-from app.utils.security import encrypt_data  # Your encryption function
+from app.utils.security import encrypt_data
+import base64
+from app.core.config import settings
 
+enc_log_key = base64.b64decode(settings.ENC_LOG_KEY)
 # Queue for async logging
 log_queue = Queue()
 
@@ -18,7 +21,7 @@ class EncryptedFileHandler(logging.Handler):
     def emit(self, record):
         try:
             msg = self.format(record)
-            encrypted_msg = encrypt_data(msg)
+            encrypted_msg = encrypt_data(msg, enc_log_key)
             self.handler.stream = self.handler._open()
             self.handler.stream.write(encrypted_msg + '\n')
             self.handler.stream.flush()

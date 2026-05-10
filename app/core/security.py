@@ -12,10 +12,10 @@ def create_jwt_token(data: dict):
         "exp": expire.timestamp(),
         "iss": "EY"
     }
-    return jwt.encode(payload, settings.APP_SECRET_KEY, algorithm=settings.ALGORITHM)
+    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.ALGORITHM)
 
 def decode_jwt_token(token: str):
-    return jwt.decode(token, settings.APP_SECRET_KEY, algorithms=settings.ALGORITHM)
+    return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=settings.ALGORITHM)
 
 def validate_appkey(appkey: str) -> dict:
     if appkey != settings.APP_KEY:
